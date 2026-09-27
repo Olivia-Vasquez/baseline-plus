@@ -20,30 +20,24 @@ export function sortMetrics(values: DailyMetrics[]) {
 }
 
 export function calculateAverage(values: DailyMetrics[]) {
+    let stepsTotal = 0;
+    let moveTotal = 0;
+    let restTotal = 0;
+    let breatheTotal = 0;
 
-    let stepsAvg = 1;
-    let moveAvg = 1;
-    let restAvg = 1;
-    let breatheAvg = 1;
-
-    const sortedValues = sortMetrics(values)
-
-    // Calculate averages for each metric
-    for (let i = 0; i < sortedValues.length; i++)
-    {
-        stepsAvg = (stepsAvg + sortedValues[i].steps)/(i+1);
-        moveAvg = (moveAvg + sortedValues[i].moveCalories)/(i+1);
-        restAvg = (restAvg + sortedValues[i].restMinutes)/(i+1);
-        breatheAvg = (breatheAvg + sortedValues[i].breatheMinutes)/(i+1);
-
+    for (const metric of values) {
+        stepsTotal += metric.steps;
+        moveTotal += metric.moveCalories;
+        restTotal += metric.restMinutes;
+        breatheTotal += metric.breatheMinutes;
     }
 
-    // Reformat averages and round for nice display
+    const count = values.length;
     const result: Averages = {
-        steps : Math.floor(stepsAvg), 
-        moveCalories :  Math.floor(moveAvg), 
-        restMinutes : Math.floor(restAvg), 
-        breatheMinutes : Math.floor(breatheAvg)
+        steps: count ? Math.floor(stepsTotal / count) : 0,
+        moveCalories: count ? Math.floor(moveTotal / count) : 0,
+        restMinutes: count ? Math.floor(restTotal / count) : 0,
+        breatheMinutes: count ? Math.floor(breatheTotal / count) : 0,
     };
 
     return result;
