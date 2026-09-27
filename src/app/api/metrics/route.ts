@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { DatabaseConfigurationError, getBaselineUserId } from "@/lib/database";
+import { DatabaseConfigurationError } from "@/lib/database";
+import { getRequestSession } from "@/lib/auth-session";
 import { DuplicateMetricDateError, insertDailyMetrics, readDailyMetrics, readMetricAverages } from "@/lib/metricsRepository";
 import type { DailyMetrics } from "@/types/metrics";
 
@@ -124,13 +125,20 @@ const parseMetricBatch = (payload: unknown): DailyMetrics[] => {
 };
 
 const databaseUnavailableResponse = () => NextResponse.json(
-  { error: "PostgreSQL is not configured or reachable. Check DATABASE_URL, BASELINE_USER_ID, and the database migrations." },
+  { error: "PostgreSQL is not configured or reachable. Check DATABASE_URL and the database migrations." },
   { status: 503 },
 );
 
-export async function GET() {
+const unauthorizedResponse = () => NextResponse.json({ error: "Authentication required." }, { status: 401 });
+
+export async function GET(request: Request) {
   try {
-    const userId = getBaselineUserId();
+    const session = await getRequestSession(request.headers);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
+    const userId = session.user.id;
     const [metrics, averages] = await Promise.all([
       readDailyMetrics(userId),
       readMetricAverages(userId),
@@ -146,6 +154,17 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  let session;
+  try {
+    session = await getRequestSession(request.headers);
+  } catch (error) {
+    console.error("Unable to validate the metrics API session.", error);
+    return databaseUnavailableResponse();
+  }
+  if (!session) {
+    return unauthorizedResponse();
+  }
+
   let metrics: DailyMetrics[];
   try {
     metrics = parseMetricBatch(await request.json());
@@ -155,7 +174,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const inserted = await insertDailyMetrics(getBaselineUserId(), metrics);
+    const inserted = await insertDailyMetrics(session.user.id, metrics);
     return NextResponse.json({ inserted }, { status: 201 });
   } catch (error) {
     if (error instanceof DuplicateMetricDateError) {

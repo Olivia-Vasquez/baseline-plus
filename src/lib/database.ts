@@ -31,12 +31,3 @@ export function getDatabasePool(): Pool {
 
   return globalWithPool.baselineDatabasePool;
 }
-
-export function getBaselineUserId(): string {
-  const userId = process.env.BASELINE_USER_ID?.trim();
-  if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)) {
-    throw new DatabaseConfigurationError("BASELINE_USER_ID must be a valid UUID.");
-  }
-
-  return userId;
-}

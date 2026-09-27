@@ -1,15 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CreditCard, UserRound, X } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 import styles from "./UserDetailsPopup.module.css";
 
 type AccountTab = "account" | "subscription";
 
 export const UserDetailsPopup = () => {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<AccountTab>("account");
   const [notice, setNotice] = useState("");
+  const [signingOut, setSigningOut] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -59,6 +64,23 @@ export const UserDetailsPopup = () => {
   const selectTab = (tab: AccountTab) => {
     setActiveTab(tab);
     setNotice("");
+  };
+
+  const signOut = async () => {
+    setSigningOut(true);
+    try {
+      const result = await authClient.signOut();
+      if (result.error) {
+        setNotice("Unable to sign out. Please try again.");
+        setSigningOut(false);
+        return;
+      }
+      router.replace("/");
+      router.refresh();
+    } catch {
+      setNotice("Unable to sign out. Please try again.");
+      setSigningOut(false);
+    }
   };
 
   return (
@@ -148,32 +170,36 @@ export const UserDetailsPopup = () => {
                 <dl className={styles.detailsList}>
                   <div className={styles.detailRow}>
                     <dt>Name</dt>
-                    <dd>Baseline User</dd>
+                    <dd>{session?.user.name ?? "Loading account"}</dd>
                   </div>
                   <div className={styles.detailRow}>
                     <dt>Email</dt>
-                    <dd>Not connected</dd>
+                    <dd>{session?.user.email ?? "—"}</dd>
                   </div>
                   <div className={styles.detailRow}>
                     <dt>Sign-in method</dt>
-                    <dd>Local demo session</dd>
+                    <dd>Email and password</dd>
                   </div>
                   <div className={styles.detailRow}>
                     <dt>Account status</dt>
-                    <dd><span className={styles.statusDot} /> Demo account</dd>
+                    <dd>
+                      <span className={styles.statusDot} />
+                      {session?.user.emailVerified ? "Verified" : "Pending verification"}
+                    </dd>
                   </div>
                 </dl>
                 <div className={styles.actionRow}>
                   <div>
-                    <h3>Login &amp; account management</h3>
-                    <p>Profile and sign-in changes are not connected in this demo.</p>
+                    <h3>Sign-in security</h3>
+                    <p>Your account is secured with email verification.</p>
                   </div>
                   <button
                     className={styles.secondaryButton}
                     type="button"
-                    onClick={() => setNotice("Login and account management will be available when account sign-in is connected.")}
+                    disabled={signingOut}
+                    onClick={signOut}
                   >
-                    Manage login
+                    {signingOut ? "Signing out..." : "Sign out"}
                   </button>
                 </div>
               </section>

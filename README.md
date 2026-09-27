@@ -5,13 +5,17 @@ Baseline is a personal recovery and activity dashboard. Daily records and their 
 ## PostgreSQL Setup
 
 1. Create a PostgreSQL database with your provider or local PostgreSQL installation.
-2. Copy `.env.example` to `.env.local` and set `DATABASE_URL` to the database connection string. `BASELINE_USER_ID` must identify the user whose records this app instance will access; the example UUID matches the development seed.
-3. Apply the schema, provider-integration foundation, webhook minimization, and development data once:
+2. Copy `.env.example` to `.env.local` and set `DATABASE_URL` to the database connection string. Generate a private auth secret with `openssl rand -base64 32`. Set `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` for the deployment. `NEXT_PUBLIC_APP_URL` must match the public application URL.
+3. Load the environment and apply the schema, provider-integration foundation, auth tables, and development data once:
 
 ```bash
+set -a
+source .env.local
+set +a
 npm run db:migrate
 npm run db:migrate:providers
 npm run db:migrate:webhook-minimization
+npm run db:migrate:auth
 npm run db:seed
 ```
 
@@ -24,7 +28,9 @@ npm install
 npm run dev
 ```
 
-PostgreSQL must be reachable before opening the dashboard. The app displays a connection/setup state if `DATABASE_URL`, `BASELINE_USER_ID`, the schema, or seeded user is missing. For local PostgreSQL without TLS, remove `?sslmode=require` from the example URL. Managed database providers generally require SSL and supply their own connection string.
+PostgreSQL must be reachable before creating an account or opening the dashboard. Configure `RESEND_API_KEY` and a verified `RESEND_FROM_EMAIL` to send verification email. In local development, if the Resend key is unset, the verification link is printed only in the dev server output. For local PostgreSQL without TLS, remove `?sslmode=require` from the example URL. Managed database providers generally require SSL and supply their own connection string.
+
+To retain access to the seeded dashboard data locally, set `BASELINE_DEMO_PASSWORD` to a password of at least 12 characters and run `NODE_ENV=development npm run auth:bootstrap-demo`. This marks only the seeded demo user as verified and creates or updates its Better Auth credential. The script refuses to run unless `NODE_ENV=development`.
 
 ## Data Model
 
@@ -34,13 +40,13 @@ The provider foundation adds `provider_connections` for consent/scopes and encry
 
 These tables are foundation only: provider OAuth, webhook handlers, workers, device companions, and the new aggregate/score pipeline are not implemented yet. Strava is intentionally not connected: its June 2026 API policy appears to prohibit the persistent storage and cross-source analytics Baseline needs. Obtain written provider clarification and legal approval before implementing any Strava-derived storage or scoring. Garmin also requires program approval and may license specific commercial metrics; Oura requires app approval above 10 users.
 
-Before building connectors, replace the demo `BASELINE_USER_ID` account selection with authenticated server sessions. Store provider tokens only encrypted at rest, never return credentials to the client, request minimal scopes, verify webhook signatures, enqueue event processing, and implement disconnect, provider revocation, user deletion, retention purges, and periodic reconciliation.
+Before building connectors, use the authenticated server session as the sole source of user identity. Store provider tokens only encrypted at rest, never return credentials to the client, request minimal scopes, verify webhook signatures, enqueue event processing, and implement disconnect, provider revocation, user deletion, retention purges, and periodic reconciliation.
 
 Chart queries read a bounded window of recent records; averages are computed in PostgreSQL across the user's full history. Imports are validated on the server and inserted in a transaction. If any date already exists, the whole batch is rejected. `DATABASE_POOL_MAX` tunes the application connection pool; serverless deployments should use a provider's pooled connection endpoint.
 
 ## Account Scoping
 
-The account popup is still a demo and does not authenticate users. API queries use the server-side `BASELINE_USER_ID`; the browser cannot choose that ID. The schema is multi-user-ready, but a real authentication/session provider must be integrated before exposing multiple accounts through one deployment.
+The welcome page supports email/password registration and login. New accounts must verify their email before signing in; after following the link, they are signed in and sent to `/home`. The dashboard and metrics API derive the user ID from the validated Better Auth session. Migration `004_auth.sql` preserves existing user IDs and data, but existing users do not automatically gain credentials or verified status.
 
 ## CSV Import Format
 
