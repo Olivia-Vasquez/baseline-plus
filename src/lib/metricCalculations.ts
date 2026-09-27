@@ -1,5 +1,4 @@
 import { DailyMetrics, Averages, Changes, Trends } from "@/types/metrics";
-// import { demoMetrics } from "@/data/demoMetrics";
 
 // Sort daily metrics with insertion sort algorithm
 export function sortMetrics(values: DailyMetrics[]) {
@@ -18,30 +17,6 @@ export function sortMetrics(values: DailyMetrics[]) {
     }
     return values
 }
-
-export function calculateAverage(values: DailyMetrics[]) {
-    let stepsTotal = 0;
-    let moveTotal = 0;
-    let restTotal = 0;
-    let breatheTotal = 0;
-
-    for (const metric of values) {
-        stepsTotal += metric.steps;
-        moveTotal += metric.moveCalories;
-        restTotal += metric.restMinutes;
-        breatheTotal += metric.breatheMinutes;
-    }
-
-    const count = values.length;
-    const result: Averages = {
-        steps: count ? Math.floor(stepsTotal / count) : 0,
-        moveCalories: count ? Math.floor(moveTotal / count) : 0,
-        restMinutes: count ? Math.floor(restTotal / count) : 0,
-        breatheMinutes: count ? Math.floor(breatheTotal / count) : 0,
-    };
-
-    return result;
-};
 
 export function calculateTrend(values: DailyMetrics[]): Trends {
     const sortedValues = sortMetrics([...values]);

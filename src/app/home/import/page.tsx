@@ -3,7 +3,7 @@
 import { useState, type ChangeEvent } from "react";
 import Papa from "papaparse";
 import Link from "next/link";
-import { appendImportedMetrics, getAllDailyMetrics } from "@/lib/metricStorage";
+import { useDailyMetrics } from "@/lib/useDailyMetrics";
 import type { DailyMetrics } from "@/types/metrics";
 import styles from "./page.module.css";
 
@@ -68,6 +68,7 @@ const downloadTemplate = () => {
 };
 
 export default function ImportDataPage() {
+  const { metrics: existingMetrics, loading, error: databaseError, refresh } = useDailyMetrics();
   const [selectedFile, setSelectedFile] = useState("");
   const [preview, setPreview] = useState<DailyMetrics[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
@@ -116,7 +117,7 @@ export default function ImportDataPage() {
           ));
         }
 
-        const existingDates = new Set(getAllDailyMetrics().map((metric) => metric.date));
+        const existingDates = new Set(existingMetrics.map((metric) => metric.date));
         const incomingDates = new Set<string>();
         const parsedMetrics: DailyMetrics[] = [];
 
@@ -190,14 +191,24 @@ export default function ImportDataPage() {
     });
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     try {
-      appendImportedMetrics(preview);
-      setSuccessMessage(`${preview.length} ${preview.length === 1 ? "record" : "records"} added to your data.`);
+      const response = await fetch("/api/metrics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(preview),
+      });
+      const result = await response.json() as { inserted?: number; error?: string };
+      if (!response.ok) {
+        throw new Error(result.error ?? "The records could not be imported.");
+      }
+
+      setSuccessMessage(`${result.inserted ?? preview.length} ${preview.length === 1 ? "record" : "records"} added to PostgreSQL.`);
       setPreview([]);
       setSelectedFile("");
-    } catch {
-      setErrors(["The records could not be saved in this browser. Check available storage and try again."]);
+      refresh();
+    } catch (importError) {
+      setErrors([importError instanceof Error ? importError.message : "The records could not be imported."]);
     }
   };
 
@@ -227,8 +238,15 @@ export default function ImportDataPage() {
 
           <label className={styles.filePicker}>
             <span className={styles.filePickerTitle}>{selectedFile || "Select a CSV file"}</span>
-            <span className={styles.filePickerHelp}>CSV only, up to 5 MB</span>
-            <input type="file" accept=".csv,text/csv" onChange={handleFileChange} />
+            <span className={styles.filePickerHelp}>
+              {loading ? "Connecting to PostgreSQL..." : databaseError || "CSV only, up to 5 MB"}
+            </span>
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              onChange={handleFileChange}
+              disabled={loading || Boolean(databaseError)}
+            />
           </label>
 
           <div className={styles.formatInfo}>

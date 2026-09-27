@@ -1,9 +1,9 @@
 "use client";
 
 import styles from "./page.module.css";
-import type { Averages, Changes, Trends } from "@/types/metrics";
+import type { Changes, Trends } from "@/types/metrics";
 import { ReadinessGauge } from "@/components/readinessGauge";
-import { calculateAverage, calculateChange, calculateTrend } from "@/lib/metricCalculations";
+import { calculateChange, calculateTrend } from "@/lib/metricCalculations";
 import { MetricCard } from "@/components/MetricCard";
 import { useDailyMetrics } from "@/lib/useDailyMetrics";
 import Link from "next/link";
@@ -18,12 +18,40 @@ const formatSignedMetric = (value: number | null) => {
 };
 
 export default function Home() {
-  const dailyMetrics = useDailyMetrics();
-  const latest = dailyMetrics.reduce((latestMetric, metric) =>
-    metric.date > latestMetric.date ? metric : latestMetric,
-  );
+  const { metrics: dailyMetrics, averages, loading, error } = useDailyMetrics();
+  const latest = dailyMetrics[dailyMetrics.length - 1];
+
+  if (loading || error || !latest) {
+    return (
+      <main className={styles.page}>
+        <div className={styles.dashboard}>
+          <header className={styles.header}>
+            <div>
+              <p className={styles.eyebrow}>BASELINE / PERFORMANCE</p>
+              <h1>Dashboard</h1>
+            </div>
+            <div className={styles.headerActions}>
+              <Link className={styles.importLink} href="/home/import">Import data</Link>
+              <UserDetailsPopup />
+            </div>
+          </header>
+          <section className={styles.dataState} role={error ? "alert" : "status"}>
+            <h2>{error ? "Database connection required" : loading ? "Loading dashboard" : "No metric records yet"}</h2>
+            <p>
+              {error
+                ? error
+                : loading
+                  ? "Connecting to your PostgreSQL data."
+                  : "Connect your database and import a CSV to start tracking metrics."}
+            </p>
+            {error && <p>Set DATABASE_URL and BASELINE_USER_ID, then apply the database migration and seed.</p>}
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   const trends: Trends = calculateTrend(dailyMetrics);
-  const averages: Averages = calculateAverage(dailyMetrics);
   const changes: Changes = calculateChange(averages, latest);
   const todayMetrics = [
     { label: "Steps", value: latest.steps.toLocaleString("en-US") },

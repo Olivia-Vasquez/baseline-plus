@@ -89,6 +89,15 @@
   font-size: 13px;
 }
 
+.dataState {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .activities {
   margin-top: 32px;
 }

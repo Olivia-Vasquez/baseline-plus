@@ -9,6 +9,8 @@ type MetricDetailViewProps = {
   unit: string;
   entryHeading: string;
   records: MetricDetailRecord[];
+  loading: boolean;
+  error: string | null;
 };
 
 const formatDate = (date: string) =>
@@ -29,6 +31,8 @@ export const MetricDetailView = ({
   unit,
   entryHeading,
   records,
+  loading,
+  error,
 }: MetricDetailViewProps) => {
   const newestFirst = [...records].reverse();
   const entryCount = records.reduce((count, record) => count + record.entries.length, 0);
@@ -52,11 +56,19 @@ export const MetricDetailView = ({
               <p className={styles.eyebrow}>DAILY TOTAL</p>
               <h2 id="chart-title">{title} over time</h2>
             </div>
-            {firstDate && latestDate && (
+            {!loading && !error && firstDate && latestDate && (
               <p className={styles.dateRange}>{formatDate(firstDate)} - {formatDate(latestDate)}</p>
             )}
           </div>
-          <MetricHistoryChart data={records} metricName={title} unit={unit} />
+          {error ? (
+            <p className={styles.dataState} role="alert">{error}</p>
+          ) : loading ? (
+            <p className={styles.dataState} role="status">Loading {title.toLowerCase()} data.</p>
+          ) : records.length === 0 ? (
+            <p className={styles.dataState}>No records are available for this metric.</p>
+          ) : (
+            <MetricHistoryChart data={records} metricName={title} unit={unit} />
+          )}
         </section>
 
         <section className={styles.activities} aria-labelledby="entries-title">
@@ -65,11 +77,15 @@ export const MetricDetailView = ({
               <p className={styles.eyebrow}>DAILY CONTRIBUTIONS</p>
               <h2 id="entries-title">{entryHeading}</h2>
             </div>
-            <p className={styles.entryCount}>{entryCount} entries</p>
+            {!loading && !error && <p className={styles.entryCount}>{entryCount} entries</p>}
           </div>
 
           <div className={styles.recordList}>
-            {newestFirst.map((record) => (
+            {error ? null : loading ? (
+              <p className={styles.dataState} role="status">Loading contributions.</p>
+            ) : newestFirst.length === 0 ? (
+              <p className={styles.dataState}>No contributions are available.</p>
+            ) : newestFirst.map((record) => (
               <article className={styles.record} key={record.date}>
                 <header className={styles.recordHeading}>
                   <time dateTime={record.date}>{formatDate(record.date)}</time>

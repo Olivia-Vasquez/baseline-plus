@@ -5,7 +5,7 @@ import { sortMetrics } from "@/lib/metricCalculations";
 import { useDailyMetrics } from "@/lib/useDailyMetrics";
 
 export default function RestDetails() {
-  const dailyMetrics = useDailyMetrics();
+  const { metrics: dailyMetrics, loading, error } = useDailyMetrics();
   const records = sortMetrics([...dailyMetrics]).map((record) => ({
     date: record.date,
     total: record.restMinutes,
@@ -24,6 +24,8 @@ export default function RestDetails() {
       unit="min"
       entryHeading="Rest periods"
       records={records}
+      loading={loading}
+      error={error}
     />
   );
 }

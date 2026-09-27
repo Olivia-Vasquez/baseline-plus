@@ -5,7 +5,7 @@ import { sortMetrics } from "@/lib/metricCalculations";
 import { useDailyMetrics } from "@/lib/useDailyMetrics";
 
 export default function StepsDetails() {
-  const dailyMetrics = useDailyMetrics();
+  const { metrics: dailyMetrics, loading, error } = useDailyMetrics();
   const records = sortMetrics([...dailyMetrics]).map((record) => ({
     date: record.date,
     total: record.steps,
@@ -24,6 +24,8 @@ export default function StepsDetails() {
       unit="steps"
       entryHeading="Step activities"
       records={records}
+      loading={loading}
+      error={error}
     />
   );
 }

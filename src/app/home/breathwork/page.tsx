@@ -5,7 +5,7 @@ import { sortMetrics } from "@/lib/metricCalculations";
 import { useDailyMetrics } from "@/lib/useDailyMetrics";
 
 export default function BreathworkDetails() {
-  const dailyMetrics = useDailyMetrics();
+  const { metrics: dailyMetrics, loading, error } = useDailyMetrics();
   const records = sortMetrics([...dailyMetrics]).map((record) => ({
     date: record.date,
     total: record.breatheMinutes,
@@ -24,6 +24,8 @@ export default function BreathworkDetails() {
       unit="min"
       entryHeading="Breathwork sessions"
       records={records}
+      loading={loading}
+      error={error}
     />
   );
 }

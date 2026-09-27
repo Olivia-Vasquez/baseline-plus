@@ -1,74 +1,54 @@
 # Baseline
 
-Baseline is a personal recovery and activity dashboard built around a simple idea: health data is more useful when it is compared with your own patterns instead of only generic daily targets.
+Baseline is a personal recovery and activity dashboard. Daily records and their activity contributions are stored in PostgreSQL and served through the Next.js API.
 
-The project is currently an early frontend prototype. It uses seeded demonstration data while I develop the interface, calculations, and data model.
+## PostgreSQL Setup
 
-## Current Features
+1. Create a PostgreSQL database with your provider or local PostgreSQL installation.
+2. Copy `.env.example` to `.env.local` and set `DATABASE_URL` to the database connection string. `BASELINE_USER_ID` must identify the user whose records this app instance will access; the example UUID matches the development seed.
+3. Apply the schema and development data once:
 
-Baseline currently displays:
+```bash
+npm run db:migrate
+npm run db:seed
+```
 
-* A readiness score using a semicircular gauge
-* Steps
-* Move calories
-* Rest
-* Mindful breathing minutes
+The seed moves the existing three dashboard records and their contribution details into PostgreSQL. No metric values are embedded in the running application.
 
-The dashboard organizes these metrics into three sections:
-
-* **Today** shows the most recent entry.
-* **Trends** shows the average across the available data.
-* **Changes** shows the difference between the latest and previous entries.
-
-The readiness score is currently included in the demonstration data rather than calculated by the application. A transparent scoring model will be added later.
-
-## Built With
-
-* Next.js
-* React
-* TypeScript
-* CSS Modules
-* Inline SVG
-* Node.js and npm for local development
-
-## Running the Project Locally
-
-From the project directory, install the dependencies:
+4. Install dependencies and start the app:
 
 ```bash
 npm install
-```
-
-Start the development server:
-
-```bash
 npm run dev
 ```
 
-Open the local address shown in the terminal in your browser.
+PostgreSQL must be reachable before opening the dashboard. The app displays a connection/setup state if `DATABASE_URL`, `BASELINE_USER_ID`, the schema, or seeded user is missing. For local PostgreSQL without TLS, remove `?sslmode=require` from the example URL. Managed database providers generally require SSL and supply their own connection string.
 
-## Project Status
+## Data Model
 
-Baseline is still in active development. The current version focuses on establishing the dashboard layout, reusable components, responsive styling, and basic metric calculations before introducing a backend.
+`users` owns daily records. `daily_metrics` stores one row per user and date, enforced by a unique constraint and indexed by `(user_id, metric_date DESC)`. `metric_contributions` stores activity, step, rest, and breathwork contributions, with cascading deletion and indexes for detail-page reads.
 
-All health and activity information currently shown in the application is temporary demonstration data.
+Chart queries read a bounded window of recent records; averages are computed in PostgreSQL across the user's full history. Imports are validated on the server and inserted in a transaction. If any date already exists, the whole batch is rejected. `DATABASE_POOL_MAX` tunes the application connection pool; serverless deployments should use a provider's pooled connection endpoint.
 
-## Planned Work
+## Account Scoping
 
-* Handle empty and incomplete datasets
-* Add loading and error states
-* Develop a transparent readiness-score calculation
-* Serve demonstration data through an API
-* Add automated tests for metric calculations
-* Store data using PostgreSQL and Prisma
-* Add one real activity-data integration
+The account popup is still a demo and does not authenticate users. API queries use the server-side `BASELINE_USER_ID`; the browser cannot choose that ID. The schema is multi-user-ready, but a real authentication/session provider must be integrated before exposing multiple accounts through one deployment.
 
-## Why I’m Building It
+## CSV Import Format
 
-My professional background is primarily in C# and .NET development. I started Baseline to build practical experience with React, TypeScript, Next.js, and Node.js while working on a problem I genuinely care about.
+The Import data page accepts CSV files with exactly these columns:
 
-The project is also an exploration of how recovery and activity products can make personal data easier to understand without presenting opaque recommendations or treating the same target as appropriate for everyone.
+```text
+date,steps,moveCalories,restMinutes,breatheMinutes,readinessScore
+```
 
-## Disclaimer
+Dates must be real `YYYY-MM-DD` values. Metric values must be non-negative whole numbers; readiness must be from 0 to 100. Aggregate CSV rows are stored as imported daily summaries, not fabricated activity breakdowns.
+
+## Development Checks
+
+```bash
+npm run lint
+npm run build
+```
 
 Baseline is a personal software project and is not a medical device. It does not provide medical advice, diagnosis, or treatment recommendations.
