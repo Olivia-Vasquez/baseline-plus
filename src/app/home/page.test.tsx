@@ -7,6 +7,7 @@ const useDailyMetricsMock = vi.fn();
 vi.mock("@/lib/useDailyMetrics", () => ({
   useDailyMetrics: () => useDailyMetricsMock(),
 }));
+vi.mock("@/components/UserDetailsPopup", () => ({ UserDetailsPopup: () => null }));
 
 const { default: Home } = await import("./page");
 

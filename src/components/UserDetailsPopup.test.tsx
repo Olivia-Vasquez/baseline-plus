@@ -1,7 +1,28 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const { authClientMock, routerMock } = vi.hoisted(() => ({
+  authClientMock: {
+    useSession: vi.fn(),
+    signOut: vi.fn(),
+  },
+  routerMock: { replace: vi.fn(), refresh: vi.fn() },
+}));
+
+vi.mock("@/lib/auth-client", () => ({ authClient: authClientMock }));
+vi.mock("next/navigation", () => ({ useRouter: () => routerMock }));
+
 import { UserDetailsPopup } from "./UserDetailsPopup";
+
+beforeEach(() => {
+  authClientMock.useSession.mockReturnValue({
+    data: { user: { name: "Sam Example", email: "sam@example.com", emailVerified: true } },
+  });
+  authClientMock.signOut.mockReset().mockResolvedValue({ data: null, error: null });
+  routerMock.replace.mockReset();
+  routerMock.refresh.mockReset();
+});
 
 describe("UserDetailsPopup", () => {
   it("opens the dialog when the trigger button is clicked", async () => {
@@ -55,6 +76,21 @@ describe("UserDetailsPopup", () => {
     await user.click(screen.getByRole("tab", { name: /subscription/i }));
     expect(screen.getByRole("tab", { name: /subscription/i })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByText("Free preview")).toBeInTheDocument();
+  });
+
+  it("shows the signed-in profile and signs out", async () => {
+    const user = userEvent.setup();
+    render(<UserDetailsPopup />);
+    await user.click(screen.getByRole("button", { name: "Open account details" }));
+
+    expect(screen.getByText("Sam Example")).toBeInTheDocument();
+    expect(screen.getByText("sam@example.com")).toBeInTheDocument();
+    expect(screen.getByText("Verified")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+
+    expect(authClientMock.signOut).toHaveBeenCalledOnce();
+    expect(routerMock.replace).toHaveBeenCalledWith("/");
+    expect(routerMock.refresh).toHaveBeenCalledOnce();
   });
 
   it("wraps focus from the last to the first focusable element on Tab", async () => {

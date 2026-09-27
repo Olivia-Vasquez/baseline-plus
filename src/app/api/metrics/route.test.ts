@@ -1,18 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { DailyMetrics } from "@/types/metrics";
 
-const getBaselineUserIdMock = vi.fn();
+const getRequestSessionMock = vi.fn();
 const readDailyMetricsMock = vi.fn();
 const readMetricAveragesMock = vi.fn();
 const insertDailyMetricsMock = vi.fn();
 
-vi.mock("@/lib/database", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/database")>("@/lib/database");
-  return {
-    ...actual,
-    getBaselineUserId: () => getBaselineUserIdMock(),
-  };
-});
+vi.mock("@/lib/auth-session", () => ({
+  getRequestSession: (headers: Headers) => getRequestSessionMock(headers),
+}));
 
 vi.mock("@/lib/metricsRepository", async () => {
   const actual = await vi.importActual<typeof import("@/lib/metricsRepository")>("@/lib/metricsRepository");
@@ -48,7 +44,7 @@ const postRequest = (body: unknown) => new Request("http://localhost/api/metrics
 });
 
 beforeEach(() => {
-  getBaselineUserIdMock.mockReset().mockReturnValue("user-1");
+  getRequestSessionMock.mockReset().mockResolvedValue({ user: { id: "user-1" } });
   readDailyMetricsMock.mockReset();
   readMetricAveragesMock.mockReset();
   insertDailyMetricsMock.mockReset();
@@ -61,25 +57,27 @@ describe("GET /api/metrics", () => {
     readDailyMetricsMock.mockResolvedValueOnce(metrics);
     readMetricAveragesMock.mockResolvedValueOnce(averages);
 
-    const response = await GET();
+    const response = await GET(new Request("http://localhost/api/metrics"));
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ metrics, averages });
+    expect(readDailyMetricsMock).toHaveBeenCalledWith("user-1");
+    expect(readMetricAveragesMock).toHaveBeenCalledWith("user-1");
   });
 
-  it("returns 503 when the database configuration is invalid", async () => {
-    getBaselineUserIdMock.mockImplementation(() => {
-      throw new DatabaseConfigurationError("BASELINE_USER_ID must be a valid UUID.");
-    });
+  it("returns 401 and does not read metrics when there is no session", async () => {
+    getRequestSessionMock.mockResolvedValueOnce(null);
 
-    const response = await GET();
-    expect(response.status).toBe(503);
+    const response = await GET(new Request("http://localhost/api/metrics"));
+    expect(response.status).toBe(401);
+    expect(readDailyMetricsMock).not.toHaveBeenCalled();
+    expect(readMetricAveragesMock).not.toHaveBeenCalled();
   });
 
   it("returns 503 when reading metrics throws an unexpected error", async () => {
     readDailyMetricsMock.mockRejectedValueOnce(new Error("connection reset"));
     readMetricAveragesMock.mockResolvedValueOnce({ steps: 0, moveCalories: 0, restMinutes: 0, breatheMinutes: 0 });
 
-    const response = await GET();
+    const response = await GET(new Request("http://localhost/api/metrics"));
     expect(response.status).toBe(503);
   });
 });
@@ -90,6 +88,15 @@ describe("POST /api/metrics", () => {
     const response = await POST(postRequest([validRecord]));
     expect(response.status).toBe(201);
     await expect(response.json()).resolves.toEqual({ inserted: 1 });
+    expect(insertDailyMetricsMock).toHaveBeenCalledWith("user-1", expect.any(Array));
+  });
+
+  it("returns 401 and does not insert metrics when there is no session", async () => {
+    getRequestSessionMock.mockResolvedValueOnce(null);
+
+    const response = await POST(postRequest([validRecord]));
+    expect(response.status).toBe(401);
+    expect(insertDailyMetricsMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 when the payload is not an array", async () => {

@@ -14,16 +14,20 @@
     "db:migrate": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/001_initial_schema.sql",
     "db:migrate:providers": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/002_provider_data_foundation.sql",
     "db:migrate:webhook-minimization": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/003_minimize_webhook_storage.sql",
+    "db:migrate:auth": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/004_auth.sql",
+    "auth:bootstrap-demo": "node --env-file=.env.local scripts/bootstrap-demo-account.mjs",
     "db:seed": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/seed.sql"
   },
   "dependencies": {
+    "better-auth": "^1.7.6",
     "lucide-react": "^1.48.0",
     "next": "16.3.3",
     "papaparse": "^5.7.0",
     "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "recharts": "^3.10.1"
+    "recharts": "^3.10.1",
+    "resend": "^6.30.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.1",

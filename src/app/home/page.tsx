@@ -44,7 +44,7 @@ export default function Home() {
                   ? "Connecting to your PostgreSQL data."
                   : "Connect your database and import a CSV to start tracking metrics."}
             </p>
-            {error && <p>Set DATABASE_URL and BASELINE_USER_ID, then apply the database migration and seed.</p>}
+            {error && <p>Set DATABASE_URL, apply the database migrations, then seed the development account.</p>}
           </section>
         </div>
       </main>
