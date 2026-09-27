@@ -7,6 +7,7 @@ import { calculateAverage, calculateChange, calculateTrend } from "@/lib/metricC
 import { MetricCard } from "@/components/MetricCard";
 import { useDailyMetrics } from "@/lib/useDailyMetrics";
 import Link from "next/link";
+import { UserDetailsPopup } from "@/components/UserDetailsPopup";
 
 const formatSignedMetric = (value: number | null) => {
   if (value === null) {
@@ -56,6 +57,7 @@ export default function Home() {
           </div>
           <div className={styles.headerActions}>
             <Link className={styles.importLink} href="/home/import">Import data</Link>
+            <UserDetailsPopup />
             <time className={styles.recordDate} dateTime={latest.date}>
               Latest record · {new Date(`${latest.date}T12:00:00`).toLocaleDateString("en-US", {
                 month: "long",
