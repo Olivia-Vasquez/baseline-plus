@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/001_initial_schema.sql",
+    "db:migrate:providers": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/002_provider_data_foundation.sql",
+    "db:migrate:webhook-minimization": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/003_minimize_webhook_storage.sql",
     "db:seed": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/seed.sql"
   },
   "dependencies": {
