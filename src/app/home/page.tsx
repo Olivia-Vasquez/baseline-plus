@@ -89,7 +89,13 @@ export default function Home() {
               </div>
             </div>
             <div className={styles.metricGrid}>
-              {trendMetrics.map((metric) => <MetricCard key={metric.label} {...metric} />)}
+              {trendMetrics.map((metric) => (
+                <MetricCard
+                  key={metric.label}
+                  {...metric}
+                  href={metric.label === "Move calories" ? "/home/move-calories" : undefined}
+                />
+              ))}
             </div>
           </section>
 

@@ -1,3 +1,10 @@
+export type Activity = {
+  id: string;
+  name: string;
+  durationMinutes: number;
+  calories: number;
+};
+
 export type DailyMetrics = {
   date: string;
   steps: number;
@@ -5,6 +12,7 @@ export type DailyMetrics = {
   restMinutes: number;
   breatheMinutes: number;
   readinessScore: number;
+  activities: Activity[];
 };
 
 export type Averages = {

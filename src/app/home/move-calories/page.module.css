@@ -1,0 +1,170 @@
+.page {
+  --ink: #18352e;
+  --muted: #687a73;
+  --line: #d8e1dc;
+
+  min-height: 100vh;
+  background: #f1f5f2;
+  color: var(--ink);
+  font-family: var(--font-geist-sans);
+}
+
+.content {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 34px 40px 72px;
+}
+
+.backLink {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  margin-bottom: 24px;
+  color: #28594e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.backLink:hover {
+  color: #173d36;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.backLink:focus-visible {
+  outline: 3px solid #d57b58;
+  outline-offset: 3px;
+}
+
+.header h1 {
+  margin-top: 6px;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.eyebrow {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.description {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chartPanel {
+  margin-top: 28px;
+  padding: 22px 24px 16px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #ffffff;
+}
+
+.chartHeading,
+.activitiesHeading,
+.recordHeading,
+.activity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.chartHeading h2,
+.activitiesHeading h2 {
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.dateRange,
+.activityCount {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.activities {
+  margin-top: 32px;
+}
+
+.activitiesHeading {
+  margin-bottom: 14px;
+}
+
+.record {
+  padding: 17px 0 6px;
+  border-top: 1px solid var(--line);
+}
+
+.recordHeading {
+  margin-bottom: 3px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recordHeading p {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.activityList {
+  list-style: none;
+}
+
+.activity {
+  min-height: 58px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e7ede9;
+}
+
+.activityName {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.activityDuration {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.activityCalories {
+  color: var(--ink);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .content {
+    padding: 24px 18px 48px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .chartPanel {
+    margin-top: 22px;
+    padding: 18px 14px 12px;
+  }
+
+  .chartHeading,
+  .activitiesHeading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dateRange {
+    font-size: 12px;
+  }
+}
