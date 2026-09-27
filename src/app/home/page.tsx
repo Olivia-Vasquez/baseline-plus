@@ -93,7 +93,12 @@ export default function Home() {
                 <MetricCard
                   key={metric.label}
                   {...metric}
-                  href={metric.label === "Move calories" ? "/home/move-calories" : undefined}
+                  href={{
+                    Steps: "/home/steps",
+                    "Move calories": "/home/move-calories",
+                    "Rest (min)": "/home/rest",
+                    "Breathwork (min)": "/home/breathwork",
+                  }[metric.label]}
                 />
               ))}
             </div>

@@ -5,6 +5,38 @@ export type Activity = {
   calories: number;
 };
 
+export type StepActivity = {
+  id: string;
+  name: string;
+  durationMinutes: number;
+  steps: number;
+};
+
+export type RestPeriod = {
+  id: string;
+  name: string;
+  durationMinutes: number;
+};
+
+export type BreathworkSession = {
+  id: string;
+  name: string;
+  durationMinutes: number;
+};
+
+export type MetricDetailEntry = {
+  id: string;
+  name: string;
+  detail: string;
+  value: number;
+};
+
+export type MetricDetailRecord = {
+  date: string;
+  total: number;
+  entries: MetricDetailEntry[];
+};
+
 export type DailyMetrics = {
   date: string;
   steps: number;
@@ -13,6 +45,9 @@ export type DailyMetrics = {
   breatheMinutes: number;
   readinessScore: number;
   activities: Activity[];
+  stepActivities: StepActivity[];
+  restPeriods: RestPeriod[];
+  breathworkSessions: BreathworkSession[];
 };
 
 export type Averages = {
