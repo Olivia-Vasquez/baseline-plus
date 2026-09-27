@@ -39,6 +39,7 @@ export type MetricDetailRecord = {
 
 export type DailyMetrics = {
   date: string;
+  source?: "import";
   steps: number;
   moveCalories: number;
   restMinutes: number;

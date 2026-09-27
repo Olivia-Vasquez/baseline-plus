@@ -1,9 +1,12 @@
+"use client";
+
 import styles from "./page.module.css";
 import type { Averages, Changes, Trends } from "@/types/metrics";
-import { demoMetrics } from "@/data/demoMetrics";
 import { ReadinessGauge } from "@/components/readinessGauge";
 import { calculateAverage, calculateChange, calculateTrend } from "@/lib/metricCalculations";
 import { MetricCard } from "@/components/MetricCard";
+import { useDailyMetrics } from "@/lib/useDailyMetrics";
+import Link from "next/link";
 
 const formatSignedMetric = (value: number | null) => {
   if (value === null) {
@@ -14,11 +17,12 @@ const formatSignedMetric = (value: number | null) => {
 };
 
 export default function Home() {
-  const latest = demoMetrics.reduce((latestMetric, metric) =>
+  const dailyMetrics = useDailyMetrics();
+  const latest = dailyMetrics.reduce((latestMetric, metric) =>
     metric.date > latestMetric.date ? metric : latestMetric,
   );
-  const trends: Trends = calculateTrend(demoMetrics);
-  const averages: Averages = calculateAverage(demoMetrics);
+  const trends: Trends = calculateTrend(dailyMetrics);
+  const averages: Averages = calculateAverage(dailyMetrics);
   const changes: Changes = calculateChange(averages, latest);
   const todayMetrics = [
     { label: "Steps", value: latest.steps.toLocaleString("en-US") },
@@ -50,13 +54,16 @@ export default function Home() {
             <p className={styles.eyebrow}>BASELINE / PERFORMANCE</p>
             <h1>Dashboard</h1>
           </div>
-          <time className={styles.recordDate} dateTime={latest.date}>
-            Latest record · {new Date(`${latest.date}T12:00:00`).toLocaleDateString("en-US", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </time>
+          <div className={styles.headerActions}>
+            <Link className={styles.importLink} href="/home/import">Import data</Link>
+            <time className={styles.recordDate} dateTime={latest.date}>
+              Latest record · {new Date(`${latest.date}T12:00:00`).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </time>
+          </div>
         </header>
 
         <section className={styles.readiness} aria-labelledby="readiness-title">

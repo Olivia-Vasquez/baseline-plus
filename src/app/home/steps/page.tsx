@@ -1,15 +1,18 @@
+"use client";
+
 import { MetricDetailView } from "@/components/MetricDetailView";
-import { demoMetrics } from "@/data/demoMetrics";
 import { sortMetrics } from "@/lib/metricCalculations";
+import { useDailyMetrics } from "@/lib/useDailyMetrics";
 
 export default function StepsDetails() {
-  const records = sortMetrics([...demoMetrics]).map((record) => ({
+  const dailyMetrics = useDailyMetrics();
+  const records = sortMetrics([...dailyMetrics]).map((record) => ({
     date: record.date,
     total: record.steps,
     entries: record.stepActivities.map((activity) => ({
       id: activity.id,
       name: activity.name,
-      detail: `${activity.durationMinutes} min`,
+      detail: record.source === "import" ? "Breakdown not included in CSV" : `${activity.durationMinutes} min`,
       value: activity.steps,
     })),
   }));

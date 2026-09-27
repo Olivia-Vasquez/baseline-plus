@@ -1,15 +1,18 @@
+"use client";
+
 import { MetricDetailView } from "@/components/MetricDetailView";
-import { demoMetrics } from "@/data/demoMetrics";
 import { sortMetrics } from "@/lib/metricCalculations";
+import { useDailyMetrics } from "@/lib/useDailyMetrics";
 
 export default function RestDetails() {
-  const records = sortMetrics([...demoMetrics]).map((record) => ({
+  const dailyMetrics = useDailyMetrics();
+  const records = sortMetrics([...dailyMetrics]).map((record) => ({
     date: record.date,
     total: record.restMinutes,
     entries: record.restPeriods.map((period) => ({
       id: period.id,
       name: period.name,
-      detail: "Rest period",
+      detail: record.source === "import" ? "Breakdown not included in CSV" : "Rest period",
       value: period.durationMinutes,
     })),
   }));

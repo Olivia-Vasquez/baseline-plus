@@ -29,6 +29,35 @@
   line-height: 1.15;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.importLink {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid #c6d5cc;
+  border-radius: 4px;
+  color: #28594e;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.importLink:hover {
+  background: #e7efe9;
+}
+
+.importLink:focus-visible {
+  outline: 3px solid #d57b58;
+  outline-offset: 3px;
+}
+
 .eyebrow {
   color: var(--muted);
   font-size: 11px;
@@ -149,6 +178,12 @@
     align-items: flex-start;
     flex-direction: column;
     gap: 10px;
+  }
+
+  .headerActions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .header h1 {

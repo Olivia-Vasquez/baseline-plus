@@ -1,15 +1,18 @@
+"use client";
+
 import { MetricDetailView } from "@/components/MetricDetailView";
-import { demoMetrics } from "@/data/demoMetrics";
 import { sortMetrics } from "@/lib/metricCalculations";
+import { useDailyMetrics } from "@/lib/useDailyMetrics";
 
 export default function BreathworkDetails() {
-  const records = sortMetrics([...demoMetrics]).map((record) => ({
+  const dailyMetrics = useDailyMetrics();
+  const records = sortMetrics([...dailyMetrics]).map((record) => ({
     date: record.date,
     total: record.breatheMinutes,
     entries: record.breathworkSessions.map((session) => ({
       id: session.id,
       name: session.name,
-      detail: `${session.durationMinutes} min session`,
+      detail: record.source === "import" ? "Breakdown not included in CSV" : `${session.durationMinutes} min session`,
       value: session.durationMinutes,
     })),
   }));

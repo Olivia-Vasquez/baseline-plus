@@ -1,8 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import styles from "./page.module.css";
 import { MoveCaloriesChart } from "@/components/MoveCaloriesChart";
-import { demoMetrics } from "@/data/demoMetrics";
 import { sortMetrics } from "@/lib/metricCalculations";
+import { useDailyMetrics } from "@/lib/useDailyMetrics";
 
 const formatDate = (date: string) =>
   new Date(`${date}T12:00:00`).toLocaleDateString("en-US", {
@@ -12,7 +14,8 @@ const formatDate = (date: string) =>
   });
 
 export default function MoveCaloriesDetails() {
-  const records = sortMetrics([...demoMetrics]);
+  const dailyMetrics = useDailyMetrics();
+  const records = sortMetrics([...dailyMetrics]);
   const newestFirst = [...records].reverse();
   const activityCount = records.reduce((count, record) => count + record.activities.length, 0);
   const firstDate = records[0]?.date;
@@ -63,7 +66,9 @@ export default function MoveCaloriesDetails() {
                     <li className={styles.activity} key={activity.id}>
                       <div>
                         <p className={styles.activityName}>{activity.name}</p>
-                        <p className={styles.activityDuration}>{activity.durationMinutes} min</p>
+                        <p className={styles.activityDuration}>
+                          {record.source === "import" ? "Breakdown not included in CSV" : `${activity.durationMinutes} min`}
+                        </p>
                       </div>
                       <p className={styles.activityCalories}>
                         {activity.calories.toLocaleString("en-US")} kcal

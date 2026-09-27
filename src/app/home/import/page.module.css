@@ -1,0 +1,279 @@
+.page {
+  --ink: #18352e;
+  --muted: #687a73;
+  --line: #d8e1dc;
+
+  min-height: 100vh;
+  background: #f1f5f2;
+  color: var(--ink);
+  font-family: var(--font-geist-sans);
+}
+
+.content {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 34px 40px 72px;
+}
+
+.backLink {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  margin-bottom: 24px;
+  color: #28594e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.backLink:hover,
+.successMessage a:hover {
+  color: #173d36;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.backLink:focus-visible,
+.templateButton:focus-visible,
+.importButton:focus-visible,
+.filePicker:focus-within {
+  outline: 3px solid #d57b58;
+  outline-offset: 3px;
+}
+
+.header h1 {
+  margin-top: 6px;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.eyebrow {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.description {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.importPanel {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #ffffff;
+}
+
+.panelHeading,
+.previewHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.panelHeading h2 {
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.templateButton {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  color: #28594e;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.templateButton:hover {
+  background: #f1f5f2;
+}
+
+.filePicker {
+  display: flex;
+  min-height: 112px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px dashed #9db4a8;
+  border-radius: 4px;
+  background: #f8faf8;
+  cursor: pointer;
+}
+
+.filePicker:hover {
+  border-color: #4c8068;
+  background: #f3f8f4;
+}
+
+.filePickerTitle {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.filePickerHelp {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.filePicker input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.formatInfo {
+  margin-top: 22px;
+}
+
+.formatInfo h3,
+.errorBox h3,
+.preview h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.formatInfo code {
+  display: block;
+  margin-top: 8px;
+  padding: 10px 12px;
+  overflow-wrap: anywhere;
+  border-radius: 4px;
+  background: #f1f5f2;
+  color: #28594e;
+  font-family: var(--font-geist-mono);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.formatInfo p,
+.previewHeading p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.errorBox {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-left: 3px solid #b64d3c;
+  background: #fff5f2;
+  color: #762d22;
+}
+
+.errorBox ul {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0 0 18px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.preview {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.importButton {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 4px;
+  background: #173d36;
+  color: #f6faf7;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.importButton:hover {
+  background: #28594e;
+}
+
+.tableWrap {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+
+.tableWrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tableWrap th,
+.tableWrap td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e7ede9;
+  font-variant-numeric: tabular-nums;
+}
+
+.tableWrap th {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.successMessage {
+  margin-top: 20px;
+  padding: 13px 15px;
+  border-left: 3px solid #4c8068;
+  background: #f1f8f3;
+  color: #28594e;
+  font-size: 14px;
+}
+
+.successMessage a {
+  margin-left: 6px;
+  color: #173d36;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .content {
+    padding: 24px 18px 48px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .importPanel {
+    padding: 18px;
+  }
+
+  .panelHeading,
+  .previewHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .templateButton,
+  .importButton {
+    width: 100%;
+  }
+}
