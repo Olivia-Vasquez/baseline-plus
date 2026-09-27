@@ -14,6 +14,13 @@ export type Averages = {
   breatheMinutes: number;
 }
 
+export type Trends = {
+  steps: number | null;
+  moveCalories: number | null;
+  restMinutes: number | null;
+  breatheMinutes: number | null;
+}
+
 export type Changes = {
   steps: number;
   moveCalories: number;

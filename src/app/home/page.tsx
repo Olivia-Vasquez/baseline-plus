@@ -1,16 +1,25 @@
 import styles from "./page.module.css";
-import type { Averages, Changes } from "@/types/metrics";
+import type { Averages, Changes, Trends } from "@/types/metrics";
 import { demoMetrics } from "@/data/demoMetrics";
 import { ReadinessGauge } from "@/components/readinessGauge";
-import { calculateAverage, calculateChange } from "@/lib/metricCalculations";
+import { calculateAverage, calculateChange, calculateTrend } from "@/lib/metricCalculations";
 import { MetricCard } from "@/components/MetricCard";
+
+const formatSignedMetric = (value: number | null) => {
+  if (value === null) {
+    return "n/a";
+  }
+
+  return value > 0 ? `+${value.toLocaleString("en-US")}` : value.toLocaleString("en-US");
+};
 
 export default function Home() {
   const latest = demoMetrics.reduce((latestMetric, metric) =>
     metric.date > latestMetric.date ? metric : latestMetric,
   );
-  const trends: Averages = calculateAverage(demoMetrics);
-  const changes: Changes = calculateChange(trends, latest);
+  const trends: Trends = calculateTrend(demoMetrics);
+  const averages: Averages = calculateAverage(demoMetrics);
+  const changes: Changes = calculateChange(averages, latest);
   const todayMetrics = [
     { label: "Steps", value: latest.steps.toLocaleString("en-US") },
     { label: "Move calories", value: latest.moveCalories.toLocaleString("en-US") },
@@ -18,11 +27,11 @@ export default function Home() {
     { label: "Breathwork (min)", value: latest.breatheMinutes.toLocaleString("en-US") },
   ];
   const trendMetrics = [
-    { label: "Steps", value: trends.steps.toLocaleString("en-US") },
-    { label: "Move calories", value: trends.moveCalories.toLocaleString("en-US") },
-    { label: "Rest (min)", value: trends.restMinutes.toLocaleString("en-US") },
-    { label: "Breathwork (min)", value: trends.breatheMinutes.toLocaleString("en-US") },
-  ];
+    { label: "Steps", value: trends.steps },
+    { label: "Move calories", value: trends.moveCalories },
+    { label: "Rest (min)", value: trends.restMinutes },
+    { label: "Breathwork (min)", value: trends.breatheMinutes },
+  ].map(({ label, value }) => ({ label, value: formatSignedMetric(value) }));
   const changeMetrics = [
     { label: "Steps", value: changes.steps },
     { label: "Move calories", value: changes.moveCalories },
@@ -30,7 +39,7 @@ export default function Home() {
     { label: "Breathwork (min)", value: changes.breatheMinutes },
   ].map(({ label, value }) => ({
     label,
-    value: value > 0 ? `+${value.toLocaleString("en-US")}` : value.toLocaleString("en-US"),
+    value: formatSignedMetric(value),
   }));
 
   return (
@@ -75,8 +84,8 @@ export default function Home() {
           <section className={styles.section} aria-labelledby="trends-title">
             <div className={styles.sectionHeading}>
               <div>
-                <p className={styles.eyebrow}>ALL RECORDED DAYS</p>
-                <h2 id="trends-title">Average</h2>
+                <p className={styles.eyebrow}>LATEST VS. PREVIOUS RECORD</p>
+                <h2 id="trends-title">Trends</h2>
               </div>
             </div>
             <div className={styles.metricGrid}>

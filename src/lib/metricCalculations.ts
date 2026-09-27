@@ -1,4 +1,4 @@
-import { DailyMetrics, Averages, Changes } from "@/types/metrics";
+import { DailyMetrics, Averages, Changes, Trends } from "@/types/metrics";
 // import { demoMetrics } from "@/data/demoMetrics";
 
 // Sort daily metrics with insertion sort algorithm
@@ -42,6 +42,30 @@ export function calculateAverage(values: DailyMetrics[]) {
 
     return result;
 };
+
+export function calculateTrend(values: DailyMetrics[]): Trends {
+    const sortedValues = sortMetrics([...values]);
+    const previousIndex = sortedValues.length - 2;
+
+    if (previousIndex < 0) {
+        return {
+            steps: null,
+            moveCalories: null,
+            restMinutes: null,
+            breatheMinutes: null,
+        };
+    }
+
+    const previous = sortedValues[previousIndex];
+    const latest = sortedValues[sortedValues.length - 1];
+
+    return {
+        steps: latest.steps - previous.steps,
+        moveCalories: latest.moveCalories - previous.moveCalories,
+        restMinutes: latest.restMinutes - previous.restMinutes,
+        breatheMinutes: latest.breatheMinutes - previous.breatheMinutes,
+    };
+}
 
 export function calculateChange(trend: Averages, today: DailyMetrics) {
 
