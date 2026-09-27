@@ -7,6 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run -c vitest.integration.config.ts",
     "db:migrate": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/001_initial_schema.sql",
     "db:migrate:providers": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/002_provider_data_foundation.sql",
     "db:migrate:webhook-minimization": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f database/migrations/003_minimize_webhook_storage.sql",
@@ -22,14 +26,21 @@
     "recharts": "^3.10.1"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/node": "^22",
     "@types/papaparse": "^5.5.2",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
+    "@vitest/coverage-v8": "^5.0.2",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
-    "typescript": "^5"
+    "jsdom": "^29.1.1",
+    "typescript": "^5",
+    "vitest": "^5.0.2"
   }
 }
