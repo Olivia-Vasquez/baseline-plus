@@ -26,7 +26,7 @@ describe("AuthForm", () => {
   it("creates an account and confirms that verification email was sent", async () => {
     const user = userEvent.setup();
     authClientMock.signUp.email.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null });
-    render(<AuthForm />);
+    render(<AuthForm localVerificationLink />);
 
     await user.click(screen.getByRole("button", { name: "Create account" }));
     await user.type(screen.getByLabelText("Name"), "Sam Example");
@@ -40,14 +40,14 @@ describe("AuthForm", () => {
       password: "a-secure-password",
       callbackURL: "/home",
     });
-    expect(await screen.findByRole("status")).toHaveTextContent("Check your email for a verification link");
+    expect(await screen.findByRole("status")).toHaveTextContent("verification link printed in the development server terminal");
     expect(routerMock.replace).not.toHaveBeenCalled();
   });
 
   it("logs in and navigates to the dashboard", async () => {
     const user = userEvent.setup();
     authClientMock.signIn.email.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null });
-    render(<AuthForm />);
+    render(<AuthForm localVerificationLink={false} />);
 
     await user.type(screen.getByLabelText("Email"), "sam@example.com");
     await user.type(screen.getByLabelText("Password"), "a-secure-password");
@@ -64,7 +64,7 @@ describe("AuthForm", () => {
       data: null,
       error: { message: "Email not verified" },
     });
-    render(<AuthForm />);
+    render(<AuthForm localVerificationLink={false} />);
 
     await user.type(screen.getByLabelText("Email"), "sam@example.com");
     await user.type(screen.getByLabelText("Password"), "a-secure-password");

@@ -68,10 +68,17 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 12,
     requireEmailVerification: true,
-    onExistingUserSignUp: async () => undefined,
+    // A repeat sign-up for an existing email returns a generic response and does not
+    // resend verification on its own; resend here so unverified users aren't stuck.
+    onExistingUserSignUp: async ({ user }) => {
+      if (!user.emailVerified) {
+        await auth.api.sendVerificationEmail({ body: { email: user.email, callbackURL: "/home" } });
+      }
+    },
   },
   emailVerification: {
     sendOnSignUp: true,
+    sendOnSignIn: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       const apiKey = process.env.RESEND_API_KEY;

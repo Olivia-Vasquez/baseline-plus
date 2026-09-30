@@ -15,7 +15,7 @@ export default function Landing() {
           <div className={styles.rule} aria-hidden="true" />
           <p className={styles.caption}>A clearer view of the work and recovery behind every day.</p>
         </section>
-        <AuthForm />
+        <AuthForm localVerificationLink={process.env.NODE_ENV === "development" && !process.env.RESEND_API_KEY} />
       </main>
       <footer className={styles.footer}>BASELINE <span aria-hidden="true">·</span> DAILY METRICS</footer>
     </div>

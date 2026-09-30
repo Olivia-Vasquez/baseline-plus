@@ -7,7 +7,7 @@ import styles from "./AuthForm.module.css";
 
 type AuthMode = "sign-in" | "sign-up";
 
-export function AuthForm() {
+export function AuthForm({ localVerificationLink }: { localVerificationLink: boolean }) {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("sign-in");
   const [name, setName] = useState("");
@@ -41,7 +41,9 @@ export function AuthForm() {
         if (result.error) {
           throw new Error("Unable to create the account. Check the details and try again.");
         }
-        setNotice("Check your email for a verification link to finish creating your account.");
+        setNotice(localVerificationLink
+          ? "Account created. Open the verification link printed in the development server terminal."
+          : "Check your email for a verification link to finish creating your account.");
         return;
       }
 
